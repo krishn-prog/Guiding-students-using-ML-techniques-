@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Guidance System - Career & Academic Recommendations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #0a0e1a;
+            --navy-2: #0f1525;
+            --navy-3: #141c30;
+            --navy-4: #1a2540;
+            --navy-5: #1f2d50;
+            --gold: #c9a84c;
+            --gold-light: #e8c96d;
+            --gold-dim: rgba(201, 168, 76, 0.15);
+            --gold-glow: rgba(201, 168, 76, 0.3);
+            --silver: #a8b8d8;
+            --silver-dim: rgba(168, 184, 216, 0.12);
+            --white: #f0f4ff;
+            --white-dim: rgba(240, 244, 255, 0.06);
+            --success: #3ecf8e;
+            --success-dim: rgba(62, 207, 142, 0.12);
+            --danger: #ff5c7c;
+            --danger-dim: rgba(255, 92, 124, 0.12);
+            --warning: #ffb347;
+            --warning-dim: rgba(255, 179, 71, 0.12);
+            --border: rgba(201, 168, 76, 0.18);
+            --border-subtle: rgba(168, 184, 216, 0.1);
+            --radius: 16px;
+            --radius-sm: 8px;
+            --radius-pill: 50px;
+            --shadow: 0 8px 40px rgba(0,0,0,0.5);
+            --shadow-gold: 0 4px 30px rgba(201, 168, 76, 0.12);
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'DM Sans', sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--navy);
+            color: var(--white);
+            min-height: 100vh;
+            padding: 30px 20px 60px;
+            overflow-x: hidden;
+        }
+
+        /* ── Animated noise texture overlay ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Ambient glow orbs ── */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -200px;
+            left: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: driftOrb 18s ease-in-out infinite alternate;
+        }
+
+        @keyframes driftOrb {
+            0%   { transform: translate(0,0); }
+            100% { transform: translate(300px, 200px); }
+        }
+
+        .container {
+            max-width: 1260px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ══════════════════════════════════
+           HEADER
+        ══════════════════════════════════ */
+        header {
+            position: relative;
+            padding: 60px 50px 50px;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, var(--navy-3) 0%, var(--navy-4) 100%);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow), var(--shadow-gold);
+            margin-bottom: 32px;
+            text-align: center;
+            overflow: hidden;
+            animation: fadeDown 0.8s ease both;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 320px; height: 320px;
+            background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; left: -80px;
+            width: 260px; height: 260px;
+            background: radial-gradient(circle, rgba(62,207,142,0.05) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--gold-dim);
+            border: 1px solid var(--border);
+            color: var(--gold);
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 6px 18px;
+            border-radius: var(--radius-pill);
+            margin-bottom: 24px;
+        }
+        .header-badge::before {
+            content: '';
+            width: 6px; height: 6px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: pulse 2s ease infinite;
+        }
+        @keyframes pulse {
+            0%,100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.7); }
+        }
+
+        header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            color: var(--white);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 14px;
+            background: linear-gradient(135deg, #f0f4ff 30%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            color: var(--silver);
+            font-size: 1.05rem;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+        }
+
+        .header-line {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), transparent);
+            margin: 20px auto 0;
+            border-radius: 2px;
+        }
+
+        /* ══════════════════════════════════
+           GRID
+        ══════════════════════════════════ */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .main-content { grid-template-columns: 1fr; }
+        }
+
+        /* ══════════════════════════════════
+           CARD BASE
+        ══════════════════════════════════ */
+        .form-section,
+        .results-section {
+            background: var(--navy-3);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 36px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeUp 0.8s ease both;
+        }
+
+        .results-section { animation-delay: 0.1s; }
+
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--gold-dim);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .section-title-text {
+            flex: 1;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, var(--gold), transparent);
+            margin-bottom: 28px;
+            margin-top: -16px;
+        }
+
+        /* ══════════════════════════════════
+           FORM ELEMENTS
+        ══════════════════════════════════ */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--silver);
+            font-weight: 500;
+            font-size: 0.82rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 13px 16px;
+            background: var(--navy-2);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-family: var(--font-body);
+            color: var(--white);
+            transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a8b8d8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 38px;
+        }
+
+        select option {
+            background: var(--navy-4);
+            color: var(--white);
+        }
+
+        input::placeholder { color: rgba(168,184,216,0.35); }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: var(--navy-4);
+            box-shadow: 0 0 0 3px var(--gold-dim);
+        }
+
+        input:hover, select:hover {
+            border-color: rgba(201,168,76,0.35);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        /* ══════════════════════════════════
+           BUTTONS
+        ══════════════════════════════════ */
+        .button-group {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        button {
+            padding: 15px 28px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-family: var(--font-body);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.03em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold) 0%, #b8922a 100%);
+            color: var(--navy);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(201,168,76,0.35);
+        }
+
+        .btn-primary:hover::before { opacity: 1; }
+        .btn-primary:active { transform: translateY(0); }
+
+        .btn-secondary {
+            background: var(--white-dim);
+            color: var(--silver);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(168,184,216,0.1);
+            border-color: rgba(168,184,216,0.3);
+            color: var(--white);
+        }
+
+        /* ══════════════════════════════════
+           ALERTS
+        ══════════════════════════════════ */
+        .error, .success {
+            padding: 13px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 22px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .error {
+            background: var(--danger-dim);
+            border: 1px solid rgba(255,92,124,0.3);
+            color: var(--danger);
+        }
+
+        .success {
+            background: var(--success-dim);
+            border: 1px solid rgba(62,207,142,0.3);
+            color: var(--success);
+        }
+
+        .error.active, .success.active { display: block; }
+
+        /* ══════════════════════════════════
+           RESULTS SECTION
+        ══════════════════════════════════ */
+        .results-section {
+            grid-column: 1 / -1;
+            display: none;
+        }
+
+        .results-section.active { display: block; }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .loading.active { display: block; }
+
+        .spinner-wrap {
+            position: relative;
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 24px;
+        }
+
+        .spinner {
+            border: 2px solid var(--border-subtle);
+            border-top: 2px solid var(--gold);
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            animation: spin 0.9s cubic-bezier(0.5,0,0.5,1) infinite;
+        }
+
+        .spinner-dot {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 8px; height: 8px;
+            background: var(--gold);
+            border-radius: 50%;
+            transform: translate(-50%,-50%);
+            animation: pulse 0.9s ease infinite;
+        }
+
+        @keyframes spin {
+            0%   { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--silver);
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+        }
+
+        .loading-subtext {
+            color: rgba(168,184,216,0.45);
+            font-size: 0.82rem;
+            margin-top: 6px;
+        }
+
+        /* ── Student info banner ── */
+        .student-info {
+            background: linear-gradient(135deg, var(--navy-4) 0%, var(--navy-5) 100%);
+            border: 1px solid var(--border);
+            padding: 28px 32px;
+            border-radius: var(--radius);
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .student-info::after {
+            content: '';
+            position: absolute;
+            right: -40px; top: -40px;
+            width: 180px; height: 180px;
+            background: radial-gradient(circle, var(--gold-dim) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .student-info h3 {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 16px;
+        }
+
+        .cluster-badge {
+            display: inline-flex;
+            align-items: center;
+            background: var(--gold-dim);
+            border: 1px solid var(--border);
+            color: var(--gold-light);
+            padding: 7px 18px;
+            border-radius: var(--radius-pill);
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.04em;
+            margin-bottom: 22px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+        }
+
+        .info-item {
+            background: var(--white-dim);
+            border: 1px solid var(--border-subtle);
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            transition: border-color 0.2s;
+        }
+
+        .info-item:hover {
+            border-color: var(--border);
+        }
+
+        .info-label {
+            color: var(--silver);
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .info-value {
+            color: var(--white);
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+
+        /* ── Career cards ── */
+        .career-recommendations {
+            margin: 32px 0;
+        }
+
+        .subsection-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .subsection-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-subtle);
+        }
+
+        .career-card {
+            position: relative;
+            background: var(--navy-4);
+            border: 1px solid var(--border-subtle);
+            padding: 22px 24px;
+            border-radius: var(--radius);
+            margin-bottom: 14px;
+            transition: all 0.28s;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        .career-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--gold), #b8922a);
+            border-radius: 2px 0 0 2px;
+        }
+
+        .career-card:nth-child(2)::before { background: linear-gradient(180deg, var(--success), #2ea070); }
+        .career-card:nth-child(3)::before { background: linear-gradient(180deg, #7c8cf8, #5b6cf0); }
+
+        .career-card:hover {
+            transform: translateX(6px);
+            border-color: var(--border);
+            box-shadow: var(--shadow-gold);
+        }
+
+        .career-rank {
+            position: absolute;
+            right: 22px; top: 50%;
+            transform: translateY(-50%);
+            font-family: var(--font-display);
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: var(--white-dim);
+            line-height: 1;
+            user-select: none;
+        }
+
+        .career-domain {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 8px;
+        }
+
+        .career-score {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--gold-dim);
+            border: 1px solid var(--border);
+            color: var(--gold-light);
+            padding: 5px 14px;
+            border-radius: var(--radius-pill);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .career-score::before {
+            content: '▲';
+            font-size: 0.6rem;
+        }
+
+        .career-card:nth-child(2) .career-score {
+            background: var(--success-dim);
+            border-color: rgba(62,207,142,0.3);
+            color: var(--success);
+        }
+        .career-card:nth-child(3) .career-score {
+            background: rgba(124,140,248,0.12);
+            border-color: rgba(124,140,248,0.3);
+            color: #7c8cf8;
+        }
+
+        /* ── Education path ── */
+        .education-path {
+            background: var(--success-dim);
+            border: 1px solid rgba(62,207,142,0.2);
+            padding: 24px 28px;
+            border-radius: var(--radius);
+            margin: 28px 0;
+        }
+
+        .education-path .subsection-title { color: var(--success); }
+        .education-path .subsection-title::after { background: rgba(62,207,142,0.2); }
+
+        .program-level {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 14px;
+        }
+
+        .program-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .program-tag {
+            background: rgba(62,207,142,0.15);
+            border: 1px solid rgba(62,207,142,0.3);
+            color: var(--success);
+            padding: 7px 16px;
+            border-radius: var(--radius-pill);
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .program-tag:hover {
+            background: rgba(62,207,142,0.25);
+            transform: translateY(-1px);
+        }
+
+        /* ── Skills ── */
+        .skills-section { margin: 28px 0; }
+
+        .skill-category {
+            margin-bottom: 22px;
+        }
+
+        .skill-category h4 {
+            color: var(--silver);
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+        }
+
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+        }
+
+        .skill-tag {
+            background: var(--white-dim);
+            border: 1px solid var(--border-subtle);
+            color: var(--silver);
+            padding: 7px 15px;
+            border-radius: var(--radius-pill);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .skill-tag:hover {
+            background: var(--gold-dim);
+            border-color: var(--border);
+            color: var(--gold-light);
+            transform: translateY(-1px);
+        }
+
+        /* ── Action items ── */
+        .action-items { margin: 28px 0; }
+
+        .action-item {
+            background: var(--navy-4);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            transition: border-color 0.2s, transform 0.2s;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 14px;
+            align-items: start;
+        }
+
+        .action-item:hover {
+            border-color: var(--border);
+            transform: translateX(4px);
+        }
+
+        .action-priority {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--danger-dim);
+            border: 1px solid rgba(255,92,124,0.25);
+            color: var(--danger);
+            padding: 5px 13px;
+            border-radius: var(--radius-pill);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .action-priority.medium {
+            background: var(--warning-dim);
+            border-color: rgba(255,179,71,0.25);
+            color: var(--warning);
+        }
+
+        .action-priority.low {
+            background: var(--success-dim);
+            border-color: rgba(62,207,142,0.25);
+            color: var(--success);
+        }
+
+        .action-body { }
+
+        .action-text {
+            color: var(--white);
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            line-height: 1.45;
+        }
+
+        .action-timeline {
+            color: rgba(168,184,216,0.5);
+            font-size: 0.8rem;
+            font-weight: 400;
+        }
+
+        /* ══════════════════════════════════
+           FOOTER
+        ══════════════════════════════════ */
+        footer {
+            background: var(--navy-3);
+            border: 1px solid var(--border-subtle);
+            padding: 24px;
+            border-radius: var(--radius);
+            text-align: center;
+            margin-top: 28px;
+            animation: fadeUp 0.8s ease 0.2s both;
+        }
+
+        footer p {
+            color: rgba(168,184,216,0.5);
+            font-size: 0.85rem;
+            line-height: 1.7;
+        }
+
+        footer p:first-child {
+            color: var(--silver);
+            font-weight: 500;
+        }
+
+        footer strong {
+            color: var(--gold);
+        }
+
+        /* ══════════════════════════════════
+           SCROLLBAR
+        ══════════════════════════════════ */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--navy); }
+        ::-webkit-scrollbar-thumb { background: var(--navy-5); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,0.4); }
+
+        /* ══════════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════════ */
+        @media (max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; }
+            .button-group { grid-template-columns: 1fr; }
+            .form-section, .results-section { padding: 24px 20px; }
+            header { padding: 36px 24px 32px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-badge">ML-Powered Academic System v1.0</div>
+            <h1>Student Guidance System</h1>
+            <p>Career & Academic Path Recommendations powered by Machine Learning</p>
+            <div class="header-line"></div>
+        </header>
+
+        <div class="main-content">
+            <!-- Form Section -->
+            <div class="form-section">
+                <h2 class="section-title">
+                    <span class="section-title-icon"></span>
+                    <span class="section-title-text">Student Profile</span>
+                </h2>
+                <div class="section-divider"></div>
+
+                <div class="error" id="errorMessage"></div>
+                <div class="success" id="successMessage"></div>
+
+                <form id="studentForm">
+                    <div class="form-group">
+                        <label for="studentId">Student ID</label>
+                        <input type="number" id="studentId" name="studentId" required placeholder="e.g., 1001">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" id="age" name="age" min="15" max="25" required placeholder="e.g., 18">
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <select id="gender" name="gender" required>
+                                <option value="">Select</option>
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="school">School</label>
+                        <select id="school" name="school" required>
+                            <option value="">Select School</option>
+                            <option value="GP">Gabriel Pereira</option>
+                            <option value="MS">Mousinho da Silveira</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="grade1">1st Period Grade (0–20)</label>
+                            <input type="number" id="grade1" name="grade1" min="0" max="20" step="0.1" required placeholder="e.g., 10">
+                        </div>
+                        <div class="form-group">
+                            <label for="grade2">2nd Period Grade (0–20)</label>
+                            <input type="number" id="grade2" name="grade2" min="0" max="20" step="0.1" required placeholder="e.g., 12">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="grade3">Final Grade (0–20)</label>
+                            <input type="number" id="grade3" name="grade3" min="0" max="20" step="0.1" required placeholder="e.g., 14">
+                        </div>
+                        <div class="form-group">
+                            <label for="studyTime">Study Time</label>
+                            <select id="studyTime" name="studyTime" required>
+                                <option value="">Select</option>
+                                <option value="1">&lt; 2 hours</option>
+                                <option value="2">2–5 hours</option>
+                                <option value="3">5–10 hours</option>
+                                <option value="4">&gt; 10 hours</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="absences">Absences</label>
+                            <input type="number" id="absences" name="absences" min="0" max="93" required placeholder="e.g., 5">
+                        </div>
+                        <div class="form-group">
+                            <label for="failures">Past Failures</label>
+                            <input type="number" id="failures" name="failures" min="0" max="4" required placeholder="e.g., 0">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="parentalEducation">Parental Education</label>
+                            <select id="parentalEducation" name="parentalEducation" required>
+                                <option value="">Select</option>
+                                <option value="0">None</option>
+                                <option value="1">Primary (1st–4th)</option>
+                                <option value="2">Lower Secondary</option>
+                                <option value="3">Upper Secondary</option>
+                                <option value="4">Higher Education</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="motivation">Motivation (0–10)</label>
+                            <input type="number" id="motivation" name="motivation" min="0" max="10" step="0.5" required placeholder="e.g., 8">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="support">School / Family Support</label>
+                            <select id="support" name="support" required>
+                                <option value="">Select</option>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="extracurricular">Extracurricular Activities</label>
+                            <select id="extracurricular" name="extracurricular" required>
+                                <option value="">Select</option>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stressLevel">Stress Level (0–10)</label>
+                        <input type="number" id="stressLevel" name="stressLevel" min="0" max="10" step="0.5" required placeholder="e.g., 5">
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-primary"> Get Guidance</button>
+                        <button type="reset" class="btn-secondary"> Clear</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection">
+                <h2 class="section-title">
+                    <span class="section-title-icon"></span>
+                    <span class="section-title-text">Guidance Results</span>
+                </h2>
+                <div class="section-divider"></div>
+
+                <div id="loadingIndicator" class="loading">
+                    <div class="spinner-wrap">
+                        <div class="spinner"></div>
+                        <div class="spinner-dot"></div>
+                    </div>
+                    <div class="loading-text">Analyzing student profile…</div>
+                    <div class="loading-subtext">Running ML clustering & recommendation engine</div>
+                </div>
+
+                <div id="guidanceResults"></div>
+            </div>
+        </div>
+
+        <footer>
+            <p> Student Guidance System &nbsp;|&nbsp; <strong>Powered by Machine Learning</strong></p>
+            <p>Built with care for better student futures</p>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000';
+
+        function showLoading() {
+            document.getElementById('loadingIndicator').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingIndicator').classList.remove('active');
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.classList.add('active');
+            setTimeout(() => errorEl.classList.remove('active'), 5000);
+        }
+
+        function showSuccess(message) {
+            const successEl = document.getElementById('successMessage');
+            successEl.textContent = message;
+            successEl.classList.add('active');
+            setTimeout(() => successEl.classList.remove('active'), 5000);
+        }
+
+        function formatPercentage(value) {
+            return (value * 100).toFixed(1) + '%';
+        }
+
+        function renderResults(data) {
+            const resultsDiv = document.getElementById('guidanceResults');
+
+            const html = `
+                <div class="student-info">
+                    <h3>Student ${data.student_id}</h3>
+                    <span class="cluster-badge">${data.cluster_profile}</span>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Performance Level</div>
+                            <div class="info-value">${data.performance_level}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Analysis Date</div>
+                            <div class="info-value">${new Date(data.timestamp).toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="career-recommendations">
+                    <div class="subsection-title"> Career Recommendations</div>
+                    ${Object.entries(data.career_recommendations)
+                        .slice(0, 3)
+                        .map((entry, index) => `
+                            <div class="career-card">
+                                <div class="career-rank">${index + 1}</div>
+                                <div class="career-domain">${entry[0]}</div>
+                                <span class="career-score">Match Score: ${formatPercentage(entry[1])}</span>
+                            </div>
+                        `).join('')}
+                </div>
+
+                <div class="education-path">
+                    <div class="subsection-title"> Recommended Education Path</div>
+                    <div class="program-level">${data.education_path.program_level}</div>
+                    <div class="program-types">
+                        ${data.education_path.program_types
+                            .map(type => `<span class="program-tag">${type}</span>`)
+                            .join('')}
+                    </div>
+                </div>
+
+                <div class="skills-section">
+                    <div class="subsection-title"> Skills to Develop</div>
+
+                    <div class="skill-category">
+                        <h4>Technical Skills</h4>
+                        <div class="skill-list">
+                            ${data.skill_development.technical_skills
+                                .map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <h4>Soft Skills</h4>
+                        <div class="skill-list">
+                            ${data.skill_development.soft_skills
+                                .map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <h4>Priority Areas</h4>
+                        <div class="skill-list">
+                            ${data.skill_development.priority_areas
+                                .map(area => `<span class="skill-tag">${area}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-items">
+                    <div class="subsection-title"> Action Items</div>
+                    ${data.action_items.map(item => `
+                        <div class="action-item">
+                            <span class="action-priority ${item.priority.toLowerCase()}">${item.priority}</span>
+                            <div class="action-body">
+                                <div class="action-text">${item.action}</div>
+                                <div class="action-timeline">⏱ ${item.timeline}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            resultsDiv.innerHTML = html;
+        }
+
+        document.getElementById('studentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                student_id: parseInt(document.getElementById('studentId').value),
+                age: parseInt(document.getElementById('age').value),
+                gender: document.getElementById('gender').value,
+                school: document.getElementById('school').value,
+                study_time: parseInt(document.getElementById('studyTime').value),
+                absences: parseInt(document.getElementById('absences').value),
+                grade_1: parseFloat(document.getElementById('grade1').value),
+                grade_2: parseFloat(document.getElementById('grade2').value),
+                grade_3: parseFloat(document.getElementById('grade3').value),
+                failures: parseInt(document.getElementById('failures').value),
+                parental_education: parseFloat(document.getElementById('parentalEducation').value),
+                support: document.getElementById('support').value === 'true',
+                extracurricular: document.getElementById('extracurricular').value === 'true',
+                motivation: parseFloat(document.getElementById('motivation').value),
+                stress_level: parseFloat(document.getElementById('stressLevel').value)
+            };
+
+            document.getElementById('resultsSection').classList.add('active');
+            showLoading();
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/guidance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                hideLoading();
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to get guidance');
+                }
+
+                const data = await response.json();
+                renderResults(data);
+                showSuccess(' Guidance generated successfully!');
+
+            } catch (error) {
+                hideLoading();
+                showError(' Error: ' + error.message + '\n\nMake sure the Flask API is running on port 5000:\npython app_flask_fixed.py');
+                console.error('Error:', error);
+            }
+        });
+
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/health`);
+                if (response.ok) {
+                    showSuccess(' Connected to Student Guidance System API');
+                }
+            } catch (error) {
+                showError(' API is not running. Please start it with:\npython app_flask_fixed.py');
+            }
+        });
+    </script>
+</body>
+</html>
